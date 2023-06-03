@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <vector>
 #include <numeric>
+#include <fstream>
 using namespace std;
 
 class car
@@ -19,10 +20,21 @@ public:
 		this->engine = engine;
 		this->price = price;
 	}
+	car()
+	{
+		name = "";
+		year = 0;
+		price = 0;
+		engine = 0;
+	}
 	int get_year() const { return year; };
 	int get_engine() const { return engine; };
 	int get_price() const { return price; };
 	string get_name() const { return name; };
+	void set_year(int year) { this->year = year; };
+	void set_engine(int engine) { this->engine = engine; };
+	void set_price(int price) { this->price = price; };
+	void set_name(string mark) { this->name = mark; };
 	void print()
 	{
 		cout << "Mark : " << name << endl;
@@ -30,8 +42,25 @@ public:
 		cout << "Engine : " << engine << " litres" << endl;
 		cout << "Price : " << price << '$'<<endl;
 	}
+	friend istream& operator>>(istream& is , car& c);
+	friend ostream& operator<<(ostream& os, const car& c);
 };
-
+istream& operator>>(istream& is, car& c)
+{
+	string mark;
+	int y, e, p;
+	is >> mark >> y >> e >> p;
+	c.set_name(mark);
+	c.set_year(y);
+	c.set_engine(e);
+	c.set_price(p);
+	return is;
+}
+ostream& operator<<(ostream& os, const car& c)
+{
+	os << c.get_name() << " " << c.get_year() << " " << c.get_engine() << " " << c.get_price() << endl;
+	return os;
+}
 class functor_name
 {
 	string name;
@@ -142,18 +171,20 @@ bool predicat4(const car& c1, const car& c2)
 }
 int main()
 {
-	vector <car> garage = 
+	fstream f;
+	f.open("file.txt");
+	if (!f.is_open())
 	{
-		car ("BMW" , 2008 , 500 , 4400),
-		car ("Jigul" , 1990 , 260 , 1200),
-		car ("Merc" , 1999 , 390 , 3000),
-		car ("Ferrari" , 2018 , 450 , 6000),
-		car ("Lamborgini" , 2022 , 490 , 9000),
-		car ("Toyota" , 2009 , 610 , 5000),
-	};
-	//remove_if(garage.begin(), garage.end(), [](const car& c) {return c.get_year() < 2000; });
-	//remove_if(garage.begin(), garage.end(), f);
-	//remove_if(garage.begin(), garage.end(), predicat);
+		cerr << "File wasn't found :( " << endl;
+		throw(4);
+	}
+	car tmp;
+	vector <car> garage;
+	while (f >> tmp)
+	{
+		garage.push_back(tmp);
+	}
+	f.close();
 	int choice = 1;
 	int sub_menu_choice = 1;
 	string name;
@@ -323,4 +354,15 @@ int main()
 		
 		system("cls");
 	} while (choice != 0);
+	f.open("file.txt");
+	if (!f.is_open())
+	{
+		cerr << "File wasn't found :( " << endl;
+		throw(4);
+	}
+	for (size_t i = 0; i < garage.size(); i++)
+	{
+		f << garage[i];
+	}
 }
+
